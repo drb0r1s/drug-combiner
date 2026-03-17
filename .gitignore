@@ -1,1 +1,10 @@
 /data/drug-interactions-labeled.csv
+
+/data/x-train-tfidf.pkl
+/data/x-test-tfidf.pkl
+
+/data/x-train-svd.pkl
+/data/x-test-svd.pkl
+
+/data/y-train.npy
+/data/y-test.npy
