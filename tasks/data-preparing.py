@@ -59,6 +59,7 @@ def main():
     
     counts = drugs["label"].value_counts()
     
+    # This for loop is "drawing" a table in terminal.
     for label, count in counts.items():
         print(f"{label:25s}: {count:>7,} ({count / newLength * 100:.1f}%)")
 
