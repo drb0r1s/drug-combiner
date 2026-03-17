@@ -4,7 +4,8 @@ import sys
 taskCounter = 1
 
 tasks = [
-    "data-preparing.py"
+    "data-preparing.py",
+    "feature-engineering.py"
 ]
 
 print("\nDRUG COMBINER - by Boris Marinkovic")
@@ -19,7 +20,7 @@ for task in tasks:
         print(f"\n ERROR: {task} failed! Stopping...")
         sys.exit(1)
 
-    print(f"[DC] {task}: Done.\n")
+    print(f"\n[DC] {task}: Done.\n")
     taskCounter += 1
 
 print("[DC]: All tasks are executed!")
