@@ -50,7 +50,7 @@ def main():
 
     print(f"{PREFIX} Rows before filtering: {oldLength:,}")
     print(f"{PREFIX} Rows after filtering: {newLength:,}")
-    print(f"{PREFIX} {oldLength - newLength:,} rows were removed due to invalid pattern matching.")
+    print(f"\n{PREFIX} {oldLength - newLength:,} rows were removed due to invalid pattern matching.")
 
     print(f"\n{PREFIX} Class distribution:")
     
