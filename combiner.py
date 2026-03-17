@@ -8,10 +8,10 @@ tasks = [
 ]
 
 print("\nDRUG COMBINER - by Boris Marinkovic")
-print("[DC]: Starting the execution of tasks...\n")
+print("[DC] Starting the execution of tasks...\n")
 
 for task in tasks:
-    print(f"Executing task {taskCounter}: {task}...\n")
+    print(f"[DC] Executing task {taskCounter}: {task}...\n")
     
     result = subprocess.run([sys.executable, f"./tasks/{task}"])
 
@@ -19,7 +19,7 @@ for task in tasks:
         print(f"\n ERROR: {task} failed! Stopping...")
         sys.exit(1)
 
-    print(f"{task}: Done.\n")
+    print(f"[DC] {task}: Done.\n")
     taskCounter += 1
 
-print("All tasks are executed!")
+print("[DC]: All tasks are executed!")
