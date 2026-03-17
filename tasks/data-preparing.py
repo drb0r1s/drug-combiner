@@ -1,9 +1,6 @@
 # Task 1: Data Preparing
 # Reads the CSV and assigns an interaction type label to each row based on regular-expression matching of the descriptions.
 
-# ID CLASS DESCRIPTION
-# 0 increase_effect ""
-
 # Rows where no pattern matches are dropped.
 
 import re
