@@ -8,3 +8,5 @@
 
 /data/y-train.npy
 /data/y-test.npy
+
+/models/*
