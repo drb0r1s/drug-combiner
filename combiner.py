@@ -7,7 +7,8 @@ tasks = [
     "data-preparing.py",
     "feature-engineering.py",
     "classic-training.py",
-    "neural-network-training.py"
+    "neural-network-training.py",
+    "compare-models.py"
 ]
 
 print("\nDRUG COMBINER - by Boris Marinkovic")
