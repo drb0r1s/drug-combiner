@@ -10,3 +10,7 @@
 /data/y-test.npy
 
 /models/*
+
+/graphs/*
+
+/results/*
