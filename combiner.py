@@ -5,7 +5,8 @@ taskCounter = 1
 
 tasks = [
     "data-preparing.py",
-    "feature-engineering.py"
+    "feature-engineering.py",
+    "classic-training.py"
 ]
 
 print("\nDRUG COMBINER - by Boris Marinkovic")
