@@ -46,7 +46,7 @@ def evaluate(name, model, XTest, YTest, labelEncoder):
         "f1": f1_score(YTest, YPred, average="weighted", zero_division=0),
     }
 
-    print(f"{PREFIX} {name}")
+    print(f"{PREFIX} {name}\n")
     print(classification_report(YTest, YPred, target_names=labelEncoder.classes_, zero_division=0))
 
     confusionMatrix = confusion_matrix(YTest, YPred)
@@ -63,7 +63,7 @@ def evaluate(name, model, XTest, YTest, labelEncoder):
     plt.tight_layout()
 
     imageName = name.lower().replace(" ", "_")
-    fig.savefig(f"graphs/confusion-matrix_{imageName}.png", dpi=150)
+    fig.savefig(f"graphs/confusion-matrix-{imageName}.png", dpi=150)
     
     plt.close(fig)
 
@@ -93,7 +93,7 @@ def main():
     allMetrics = []
 
     for name, classifier in models:
-        print(f"\n{PREFIX} Training {name}...\n")
+        print(f"{PREFIX} Training {name}...\n")
 
         classifier.fit(XTrain, YTrain)
 
