@@ -20,7 +20,7 @@ for task in tasks:
     result = subprocess.run([sys.executable, f"./tasks/{task}"])
 
     if result.returncode != 0:
-        print(f"\n ERROR: {task} failed! Stopping...")
+        print(f"\n[DC] ERROR: {task} failed! Stopping...")
         sys.exit(1)
 
     print(f"\n[DC] {task}: Done.\n")
