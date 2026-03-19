@@ -1,6 +1,5 @@
 # Chat
 
-import re
 import joblib
 import numpy as np
 from functions.cleanSpecialCharacters import cleanSpecialCharacters
