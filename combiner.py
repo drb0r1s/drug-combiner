@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 
@@ -14,10 +15,12 @@ tasks = [
 print("\nDRUG COMBINER - by Boris Marinkovic")
 print("[DC] Starting the execution of tasks...\n")
 
+root = os.path.dirname(os.path.abspath(__file__))
+
 for task in tasks:
     print(f"[DC] Executing task {taskCounter}: {task}...\n")
     
-    result = subprocess.run([sys.executable, f"./tasks/{task}"])
+    result = subprocess.run([sys.executable, f"./tasks/{task}"], cwd=root)
 
     if result.returncode != 0:
         print(f"\n[DC] ERROR: {task} failed! Stopping...")
