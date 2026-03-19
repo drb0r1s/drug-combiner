@@ -37,7 +37,7 @@ def assignLabel(text: str) -> str | None:
 def main():
     drugs = pd.read_csv(DATA)
     
-    drugs.columns = ["drug1", "drug2", "description"] # Overriding default column names to a more appropriate ones.
+    drugs.columns = ["drug1", "drug2", "description", "drug1_class", "drug2_class"] # Overriding default column names to a more appropriate ones.
     drugs = drugs.dropna(subset=["description"]) # Removing empty descriptions.
 
     drugs["label"] = drugs["description"].apply(assignLabel)

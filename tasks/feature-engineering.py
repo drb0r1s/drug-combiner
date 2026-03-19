@@ -16,12 +16,21 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.pipeline import Pipeline
-from functions.cleanSpecialCharacters import cleanSpecialCharacters
+from scipy.sparse import hstack, csr_matrix
 
 PREFIX = "[DC: Feature Engineering]"
 
 LABELED_DATA = "data/drug-interactions-labeled.csv"
 SEED = 999 # Random seed.
+
+# Removing every character except for letters and spaces, so that model does not treat "increased" and "increased." as different values.
+def cleanSpecialCharacters(text: str) -> str:
+    text = text.lower()
+
+    text = re.sub(r"[^a-z\s]", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+
+    return text
 
 # Masking the actual drug name with the word "DRUG".
 def maskDrugNames(row: pd.Series) -> str:
@@ -48,9 +57,22 @@ def main():
     
     joblib.dump(labelEncoder, "models/label-encoder.pkl") # Saving encoded labels to a file, so that we can easily decode them later.
 
+    # 2.5. Encoding drug classes as numbers.
+    drugClassEncoder = LabelEncoder()
+
+    allClasses = pd.concat([labeledData["drug1_class"], labeledData["drug2_class"]])
+    drugClassEncoder.fit(allClasses)
+
+    labeledData["drug1-class-id"] = drugClassEncoder.transform(labeledData["drug1_class"])
+    labeledData["drug2-class-id"] = drugClassEncoder.transform(labeledData["drug2_class"])
+
+    joblib.dump(drugClassEncoder, "models/drug-class-encoder.pkl")
+    print(f"{PREFIX} Drug classes encoded: {len(drugClassEncoder.classes_)} unique classes.\n")
+
     # 3. Creating a train/test split.
     XTrain, XTest, YTrain, YTest = train_test_split(
-        labeledData["clean-description"], labeledData["label-id"],
+        labeledData[["clean-description", "drug1-class-id", "drug2-class-id"]],
+        labeledData["label-id"],
         test_size=0.20, random_state=SEED, stratify=labeledData["label-id"]
     )
 
@@ -65,17 +87,26 @@ def main():
         min_df=3,
     )
 
-    XTrainTfidf = tfIdf.fit_transform(XTrain)
-    XTestTfidf  = tfIdf.transform(XTest)
+    XTrainTfidf = tfIdf.fit_transform(XTrain["clean-description"])
+    XTestTfidf = tfIdf.transform(XTest["clean-description"])
 
     joblib.dump(tfIdf, "models/tfidf-vectorizer.pkl")
     print(f"{PREFIX} Shape of TF-IDF: {XTrainTfidf.shape}\n")
+
+    # Combining TF-IDF with drug class features.
+    XTrainClasses = csr_matrix(XTrain[["drug1-class-id", "drug2-class-id"]].values)
+    XTestClasses = csr_matrix(XTest[["drug1-class-id", "drug2-class-id"]].values)
+
+    XTrainTfidf = hstack([XTrainTfidf, XTrainClasses])
+    XTestTfidf = hstack([XTestTfidf,  XTestClasses])
+
+    print(f"{PREFIX} Shape after adding drug classes: {XTrainTfidf.shape}\n")
 
     # 5. SVD reduction for the neural network.
     svd = TruncatedSVD(n_components=200, random_state=SEED)
 
     XTrainSvd = svd.fit_transform(XTrainTfidf)
-    XTestSvd  = svd.transform(XTestTfidf)
+    XTestSvd = svd.transform(XTestTfidf)
 
     explained = svd.explained_variance_ratio_.sum()
 

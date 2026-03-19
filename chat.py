@@ -1,8 +1,9 @@
 # Chat
 
+import re
 import joblib
 import numpy as np
-from functions.cleanSpecialCharacters import cleanSpecialCharacters
+from scipy.sparse import hstack, csr_matrix
 
 PREFIX="[DC: Chat]"
 CHAT_PREFIX="ChatDC:"
@@ -14,6 +15,7 @@ try:
     svd = joblib.load("models/svd-reducer.pkl")
     logisticRegression = joblib.load("models/logistic-regression.pkl")
     labelEncoder = joblib.load("models/label-encoder.pkl")
+    drugClassEncoder = joblib.load("models/drug-class-encoder.pkl")
 
     print(f"{PREFIX} All models are ready!\n")
 
@@ -37,10 +39,29 @@ LABEL_INFO = {
     "bioavailability_change": ("🟠 ABSORPTION CHANGE", "How much of the drug is absorbed into your body is affected."),
 }
 
-def predict(text: str):
+# Removing every character except for letters and spaces, so that model does not treat "increased" and "increased." as different values.
+def cleanSpecialCharacters(text: str) -> str:
+    text = text.lower()
+
+    text = re.sub(r"[^a-z\s]", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+
+    return text
+
+def predict(text: str, drug1Class: str = "Unknown", drug2Class: str = "Unknown"):
     cleaned = cleanSpecialCharacters(text)
 
-    probability = logisticRegression.predict_proba(tfidf.transform([cleaned]))[0]
+    tfidfVector = tfidf.transform([cleaned])
+    
+    # Encode drug classes and append to TF-IDF vector.
+    d1 = drugClassEncoder.transform([drug1Class])[0] if drug1Class in drugClassEncoder.classes_ else 0
+    d2 = drugClassEncoder.transform([drug2Class])[0] if drug2Class in drugClassEncoder.classes_ else 0
+
+    classVector = csr_matrix([[d1, d2]])
+    
+    combined = hstack([tfidfVector, classVector])
+
+    probability = logisticRegression.predict_proba(combined)[0]
     top3Indicies = np.argsort(probability)[::-1][:3]
 
     top_label = labelEncoder.classes_[top3Indicies[0]]
@@ -68,10 +89,18 @@ def buildDescription(drug1: str, drug2: str) -> str:
     bestConfidence  = -1
     bestLabel = None
 
+    d1 = drugClassEncoder.transform([drug1])[0] if drug1 in drugClassEncoder.classes_ else 0
+    d2 = drugClassEncoder.transform([drug2])[0] if drug2 in drugClassEncoder.classes_ else 0
+
+    classVector = csr_matrix([[d1, d2]])
+
     for template in templates:
         cleaned = cleanSpecialCharacters(template.replace(drug1, "DRUG").replace(drug2, "DRUG"))
 
-        probability = logisticRegression.predict_proba(tfidf.transform([cleaned]))[0]
+        tfidfVector = tfidf.transform([cleaned])
+        combined = hstack([tfidfVector, classVector])
+        
+        probability = logisticRegression.predict_proba(combined)[0]
         confidence = probability.max()
 
         if confidence > bestConfidence:
