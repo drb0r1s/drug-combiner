@@ -11,6 +11,17 @@ LEFT_PADDING="      "
 BOTTOM_PADDING=f"||{90*"_"}"
 MEDICAL_KEYWORDS = ["interaction", "increase", "increased", "decrease", "decreased", "metabolism", "serum", "concentration", "risk", "efficacy", "bioavailability", "activities", "adverse", "combine", "combined", "therapeutic"]
 
+TEST_CASES = [
+    "Aspirin may increase the anticoagulant activities of Warfarin",
+    "The serum concentration of Digoxin can be increased when combined with Amiodarone",
+    "The metabolism of Methadone can be decreased when combined with Fluoxetine",
+    "The risk or severity of adverse effects can be increased when Oxycodone is combined with Diazepam",
+    "The therapeutic efficacy of Metformin can be decreased when used in combination with Prednisone",
+    "The bioavailability of Clobetasol can be decreased when combined with Magnesium hydroxide",
+    "Fluoxetine may increase the serotonergic activities of Tramadol",
+    "The metabolism of Warfarin can be decreased when combined with Amiodarone",
+]
+
 print(f"{PREFIX} Loading models...")
 
 try:
@@ -130,12 +141,22 @@ def buildDescription(drug1: str, drug2: str) -> str:
 
 
 print("CHAT WITH DRUG COMBINER\n")
+
 print(f"{CHAT_PREFIX} You can enter:")
+
 print(f"||{LEFT_PADDING}1) A description, e.g.:")
 print(f'||{LEFT_PADDING}"Ibuprofen may increase the bleeding activities of Warfarin"')
+print("||")
+
 print(f"||{LEFT_PADDING}2) Two drug names separated by + e.g.:")
 print(f'||{LEFT_PADDING}"Ibuprofen + Warfarin"')
-print(f"{CHAT_PREFIX} Type quit to exit.\n")
+print("||")
+
+print(f'||{LEFT_PADDING}3) Type "test" to run predefined test cases.')
+print("||")
+
+print(f"||{LEFT_PADDING}Type quit to exit.")
+print(f"{BOTTOM_PADDING}\n")
 
 while True:
     try:
@@ -149,6 +170,17 @@ while True:
 
     if userInput.lower() in ("quit", "exit", "q"):
         print(f"\n{CHAT_PREFIX} Exiting the chat...")
+        break
+
+    if userInput.lower() in ("test", "t"):
+        print(f"\n{CHAT_PREFIX} Running predefined test cases...\n")
+
+        for i, testCase in enumerate(TEST_CASES, 1):
+            print(f"{CHAT_PREFIX} TEST {i}: {testCase}")
+            predict(testCase)
+            
+            continue
+        
         break
 
     if "+" in userInput:
