@@ -176,12 +176,12 @@ while True:
         print(f"\n{CHAT_PREFIX} Running predefined test cases...\n")
 
         for i, testCase in enumerate(TEST_CASES, 1):
-            print(f"{CHAT_PREFIX} TEST {i}: {testCase}")
+            print(f"{CHAT_PREFIX} [TEST {i}] {testCase}")
             predict(testCase)
             
             continue
         
-        break
+        continue
 
     if "+" in userInput:
         parts = userInput.split("+", 1)
