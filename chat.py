@@ -8,6 +8,7 @@ from scipy.sparse import hstack, csr_matrix
 PREFIX="[DC: Chat]"
 CHAT_PREFIX="ChatDC:"
 LEFT_PADDING="      "
+BOTTOM_PADDING=f"||{90*"_"}"
 
 print(f"{PREFIX} Loading models...")
 
@@ -68,15 +69,18 @@ def predict(text: str, drug1Class: str = "Unknown", drug2Class: str = "Unknown")
     top_label = labelEncoder.classes_[top3Indicies[0]]
     info = LABEL_INFO.get(top_label, ("?", "Unknown label."))
 
-    print(f"\n{CHAT_PREFIX} Result: {info[0]}")
+    print(f"\n{CHAT_PREFIX} {info[0]}")
     print(f"||{LEFT_PADDING}{info[1]}")
-    print(f"||{LEFT_PADDING}{CHAT_PREFIX} Top predictions:")
+    print("||")
+    print(f"||{LEFT_PADDING}Top predictions:")
 
     for i in top3Indicies:
         label = labelEncoder.classes_[i]
         short = LABEL_INFO.get(label, (label, ""))[0]
 
         print(f"||{LEFT_PADDING}{probability[i] * 100:5.1f}% {short}")
+
+    print(f"{BOTTOM_PADDING}\n")
 
 
 def buildDescription(drug1: str, drug2: str) -> str:
@@ -121,7 +125,7 @@ print(f"{CHAT_PREFIX} Type quit to exit.\n")
 
 while True:
     try:
-        userInput = input(">>> ").strip()
+        userInput = input("(Your message...) >>> ").strip()
     except (EOFError, KeyboardInterrupt):
         print(f"\n{CHAT_PREFIX} Exiting the chat...")
         break
@@ -147,5 +151,6 @@ while True:
         print(f"\n{CHAT_PREFIX} Most likely interaction type for {drug1} + {drug2}:")
         print(f"||{LEFT_PADDING}{info[0]}  ({confidence * 100:.0f}% confidence)")
         print(f"||{LEFT_PADDING}{info[1]}")
+        print(f"{BOTTOM_PADDING}\n")
     else:
         predict(userInput)
