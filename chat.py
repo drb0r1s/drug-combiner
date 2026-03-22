@@ -140,7 +140,7 @@ def buildDescription(drug1: str, drug2: str) -> str:
     return bestLabel, bestConfidence
 
 
-print("CHAT WITH DRUG COMBINER\n")
+print("CHAT WITH DRUG COMBINER - by Boris Marinkovic\n")
 
 print(f"{CHAT_PREFIX} You can enter:")
 
