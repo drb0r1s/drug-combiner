@@ -7,6 +7,7 @@ from scipy.sparse import hstack, csr_matrix
 
 PREFIX="[DC: Chat]"
 CHAT_PREFIX="ChatDC:"
+LEFT_PADDING="      "
 
 print(f"{PREFIX} Loading models...")
 
@@ -68,14 +69,14 @@ def predict(text: str, drug1Class: str = "Unknown", drug2Class: str = "Unknown")
     info = LABEL_INFO.get(top_label, ("?", "Unknown label."))
 
     print(f"\n{CHAT_PREFIX} Result: {info[0]}")
-    print(f"||      {info[1]}")
-    print(f"||      {CHAT_PREFIX} Top predictions:")
+    print(f"||{LEFT_PADDING}{info[1]}")
+    print(f"||{LEFT_PADDING}{CHAT_PREFIX} Top predictions:")
 
     for i in top3Indicies:
         label = labelEncoder.classes_[i]
         short = LABEL_INFO.get(label, (label, ""))[0]
 
-        print(f"||      {probability[i] * 100:5.1f}% {short}")
+        print(f"||{LEFT_PADDING}{probability[i] * 100:5.1f}% {short}")
 
 
 def buildDescription(drug1: str, drug2: str) -> str:
@@ -112,10 +113,10 @@ def buildDescription(drug1: str, drug2: str) -> str:
 
 print("CHAT WITH DRUG COMBINER\n")
 print(f"{CHAT_PREFIX} You can enter:")
-print("||      1) A description, e.g.:")
-print('||      "Ibuprofen may increase the bleeding activities of Warfarin"')
-print("||      2) Two drug names separated by  +  e.g.:")
-print('||      "Ibuprofen + Warfarin"')
+print(f"||{LEFT_PADDING}1) A description, e.g.:")
+print(f'||{LEFT_PADDING}"Ibuprofen may increase the bleeding activities of Warfarin"')
+print(f"||{LEFT_PADDING}2) Two drug names separated by + e.g.:")
+print(f'||{LEFT_PADDING}"Ibuprofen + Warfarin"')
 print(f"{CHAT_PREFIX} Type quit to exit.\n")
 
 while True:
@@ -143,8 +144,8 @@ while True:
         label, confidence = buildDescription(drug1, drug2)
         info = LABEL_INFO.get(label, (label, ""))
 
-        print(f"{CHAT_PREFIX} Most likely interaction type for {drug1} + {drug2}:")
-        print(f"{info[0]}  ({confidence * 100:.0f}% confidence)")
-        print(f"{info[1]}")
+        print(f"\n{CHAT_PREFIX} Most likely interaction type for {drug1} + {drug2}:")
+        print(f"||{LEFT_PADDING}{info[0]}  ({confidence * 100:.0f}% confidence)")
+        print(f"||{LEFT_PADDING}{info[1]}")
     else:
         predict(userInput)
