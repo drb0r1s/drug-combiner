@@ -9,6 +9,7 @@ PREFIX="[DC: Chat]"
 CHAT_PREFIX="ChatDC:"
 LEFT_PADDING="      "
 BOTTOM_PADDING=f"||{90*"_"}"
+MEDICAL_KEYWORDS = ["interaction", "increase", "increased", "decrease", "decreased", "metabolism", "serum", "concentration", "risk", "efficacy", "bioavailability", "activities", "adverse", "combine", "combined", "therapeutic"]
 
 print(f"{PREFIX} Loading models...")
 
@@ -50,7 +51,20 @@ def cleanSpecialCharacters(text: str) -> str:
 
     return text
 
+# It is important to block the model from responding if input is not related to pharmacology.
+def isInputValid(text: str) -> bool:
+    text = text.lower()
+    return any(keyword in text for keyword in MEDICAL_KEYWORDS)
+
 def predict(text: str, drug1Class: str = "Unknown", drug2Class: str = "Unknown"):
+    if not isInputValid(text):
+        print(f"\n{CHAT_PREFIX} Please enter a valid drug interaction description.\n")
+        return
+    
+    if len(text.split()) < 5:
+        print(f"\n{CHAT_PREFIX} Input too short. Please enter a full description.\n")
+        return
+
     cleaned = cleanSpecialCharacters(text)
 
     tfidfVector = tfidf.transform([cleaned])
