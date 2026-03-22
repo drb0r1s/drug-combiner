@@ -155,8 +155,8 @@ while True:
         parts = userInput.split("+", 1)
         drug1, drug2 = parts[0].strip(), parts[1].strip()
 
-        if not drug1 or not drug2:
-            print(f"\n{CHAT_PREFIX} Please enter two drug names separated by +.")
+        if(len(drug1) < 3 or len(drug2) < 3):
+            print(f"\n{CHAT_PREFIX} Please enter valid drug names.\n")
             continue
 
         label, confidence = buildDescription(drug1, drug2)
