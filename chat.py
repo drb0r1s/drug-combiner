@@ -9,7 +9,7 @@ PREFIX="[DC: Chat]"
 CHAT_PREFIX="ChatDC:"
 LEFT_PADDING="      "
 BOTTOM_PADDING=f"||{90*"_"}"
-MEDICAL_KEYWORDS = ["interaction", "increase", "increased", "decrease", "decreased", "metabolism", "serum", "concentration", "risk", "efficacy", "bioavailability", "activities", "adverse", "combine", "combined", "therapeutic"]
+MEDICAL_KEYWORDS = ["interaction", "increase", "increased", "enhance", "enhanced", "decrease", "decreased", "metabolism", "serum", "concentration", "risk", "efficacy", "bioavailability", "activities", "adverse", "combine", "combined", "therapeutic", "effect"]
 
 TEST_CASES = [
     "Aspirin may increase the anticoagulant activities of Warfarin",
