@@ -51,7 +51,7 @@ def main():
     # 2. Encoding labels.
     labelEncoder = LabelEncoder()
 
-    labeledData["label-id"] = labelEncoder.fit_transform(labeledData["label"])
+    labeledData["label-id"] = labelEncoder.fit_transform(labeledData["label"]) # Convert label into numerical value and write it in "label-id" column.
 
     print(f"{PREFIX} Encoded labels:", list(labelEncoder.classes_)) # Printing all encoded labels can be useful in case of debugging.
     
@@ -63,6 +63,8 @@ def main():
     allClasses = pd.concat([labeledData["drug1_class"], labeledData["drug2_class"]])
     drugClassEncoder.fit(allClasses)
 
+    # Converting drug classes into numerical values and writing them in the "drug-class-id" columns.
+    # This way we can include additional learning with actual drug classes.
     labeledData["drug1-class-id"] = drugClassEncoder.transform(labeledData["drug1_class"])
     labeledData["drug2-class-id"] = drugClassEncoder.transform(labeledData["drug2_class"])
 
@@ -71,20 +73,23 @@ def main():
 
     # 3. Creating a train/test split.
     XTrain, XTest, YTrain, YTest = train_test_split(
-        labeledData[["clean-description", "drug1-class-id", "drug2-class-id"]],
-        labeledData["label-id"],
-        test_size=0.20, random_state=SEED, stratify=labeledData["label-id"]
+        labeledData[["clean-description", "drug1-class-id", "drug2-class-id"]], # The columns on which model is going to learn.
+        labeledData["label-id"], # Target column model is trying to predict.
+        test_size=0.20, # 20% of data goes to testing, 80% to training.
+        random_state=SEED,
+        stratify=labeledData["label-id"] # Equal distribution of "label-id" values in both training and test sets.
     )
 
     print(f"\n{PREFIX} Rows for training: {len(XTrain):,}")
     print(f"{PREFIX} Rows for testing: {len(XTest):,}\n")
 
     # 4. Vectorizing TF-IDF
+    # Here we do the actual transformation of description into numerical values.
     tfIdf = TfidfVectorizer(
-        ngram_range=(1, 2),
-        max_features=30_000,
-        sublinear_tf=True,
-        min_df=3,
+        ngram_range=(1, 2), # Here we allow the model to use unigrams (single words) and bigrams (two-pair words) in extraction.
+        max_features=30_000, # Limits the vocabulary to 30000 most useful tokens.
+        sublinear_tf=True, # Using logarithmic transformation instead of the classic one, for more balanced representation of words, based on their appearance.
+        min_df=3, # Token has to appear at least 3 times before appearing in the vocabulary.
     )
 
     XTrainTfidf = tfIdf.fit_transform(XTrain["clean-description"])
@@ -97,18 +102,20 @@ def main():
     XTrainClasses = csr_matrix(XTrain[["drug1-class-id", "drug2-class-id"]].values)
     XTestClasses = csr_matrix(XTest[["drug1-class-id", "drug2-class-id"]].values)
 
+    # hstack is used here to join two matrices side by side.
     XTrainTfidf = hstack([XTrainTfidf, XTrainClasses])
     XTestTfidf = hstack([XTestTfidf,  XTestClasses])
 
     print(f"{PREFIX} Shape after adding drug classes: {XTrainTfidf.shape}\n")
 
     # 5. SVD reduction for the neural network.
+    # Specifically, we reduce the TF-IDF matrix to only the most important patterns, as a preparation for the neural network.
     svd = TruncatedSVD(n_components=200, random_state=SEED)
 
-    XTrainSvd = svd.fit_transform(XTrainTfidf)
-    XTestSvd = svd.transform(XTestTfidf)
+    XTrainSvd = svd.fit_transform(XTrainTfidf) # Learning the SVD transformed data.
+    XTestSvd = svd.transform(XTestTfidf) # Testing the knowledge of the learned SVD transformed data.
 
-    explained = svd.explained_variance_ratio_.sum()
+    explained = svd.explained_variance_ratio_.sum() # Summing all the variance between SVD columns into one single number.
 
     print(f"{PREFIX} 200 components of SVD explain {explained * 100:.1f}% variance.\n")
     joblib.dump(svd, "models/svd-reducer.pkl")
