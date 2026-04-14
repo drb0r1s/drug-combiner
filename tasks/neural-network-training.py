@@ -17,6 +17,7 @@ from sklearn.metrics import (
 )
 
 PREFIX="[DC: Neural Network Training]"
+SEED=999
 
 
 def main():
@@ -44,7 +45,7 @@ def main():
         early_stopping=True,
         validation_fraction=0.10,
         n_iter_no_change=10,
-        random_state=42,
+        random_state=SEED,
         verbose=True,
     )
 

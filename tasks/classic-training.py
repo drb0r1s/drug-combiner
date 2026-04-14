@@ -21,6 +21,7 @@ from sklearn.metrics import (
 )
 
 PREFIX="[DC: Classic Training]"
+SEED=999
 
 
 def loadData():
@@ -36,22 +37,24 @@ def loadData():
 
 
 def evaluate(name, model, XTest, YTest, labelEncoder):
-    YPred = model.predict(XTest)
+    YPred = model.predict(XTest) # Model is trying to predict YTest based on given XTest.
 
     metrics = {
         "model": name,
-        "accuracy": accuracy_score(YTest, YPred),
-        "precision": precision_score(YTest, YPred, average="weighted", zero_division=0),
-        "recall": recall_score(YTest, YPred, average="weighted", zero_division=0),
-        "f1": f1_score(YTest, YPred, average="weighted", zero_division=0),
+        "accuracy": accuracy_score(YTest, YPred), # Fraction of correct predictions.
+        "precision": precision_score(YTest, YPred, average="weighted", zero_division=0), # How much of the class X that model predicted were actually class Y.
+        "recall": recall_score(YTest, YPred, average="weighted", zero_division=0), # Similar to precision, but out of everything that was actually X how much model caught.
+        "f1": f1_score(YTest, YPred, average="weighted", zero_division=0), # Mean of precision and recall.
     }
 
     print(f"{PREFIX} {name}\n")
-    print(classification_report(YTest, YPred, target_names=labelEncoder.classes_, zero_division=0))
+    print(classification_report(YTest, YPred, target_names=labelEncoder.classes_, zero_division=0)) # The best way to present given results is to show all the properties of model with each label.
 
+    # Here we define a classic confusion matrix, YTest on X-axes and XTest on Y-axes.
     confusionMatrix = confusion_matrix(YTest, YPred)
     fig, axes = plt.subplots(figsize=(10, 8))
 
+    # Coloring the confusion matrix.
     sns.heatmap(confusionMatrix, annot=True, fmt="d", cmap="Blues", xticklabels=labelEncoder.classes_, yticklabels=labelEncoder.classes_, ax=axes)
 
     axes.set_title(f"Confusion Matrix – {name}", fontsize=13, pad=12)
@@ -76,17 +79,26 @@ def main():
     models = [
         (
             "Complement Naive Bayes",
-            ComplementNB(alpha=0.1)
+            ComplementNB(alpha=0.1) # Alpha is intentionally low here, we want the model to trust the data as much as possible.
         ),
 
         (
             "Logistic Regression",
-            LogisticRegression(C=5.0, max_iter=2000, solver="saga", random_state=42)
+            LogisticRegression(
+                C=5.0, # The best value for fitting to training data.
+                max_iter=2000, # Number of optimizations the model runs before stopping.
+                solver="saga", # Internal optimization of the model, good for models with a lot of data.
+                random_state=SEED
+            )
         ),
 
         (
             "SVM (LinearSVC)",
-            LinearSVC(C=1.0, max_iter=2000, random_state=42)
+            LinearSVC(
+                C=1.0,
+                max_iter=2000,
+                random_state=SEED
+            )
         )
     ]
 
@@ -95,6 +107,7 @@ def main():
     for name, classifier in models:
         print(f"{PREFIX} Training {name}...\n")
 
+        # Actual training of the model.
         classifier.fit(XTrain, YTrain)
 
         joblib.dump(classifier, f"models/{name.lower().replace(' ', '-').replace('(','').replace(')','').strip()}.pkl")
