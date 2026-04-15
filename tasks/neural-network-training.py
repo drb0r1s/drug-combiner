@@ -35,40 +35,42 @@ def main():
     print(f"{PREFIX} Classes: {len(labelEncoder.classes_)}\n")
 
     mlp = MLPClassifier(
-        hidden_layer_sizes=(512, 256),
-        activation="relu",
-        solver="adam",
-        alpha=1e-4,
-        batch_size=256,
-        learning_rate_init=1e-3,
-        max_iter=200,
-        early_stopping=True,
-        validation_fraction=0.10,
-        n_iter_no_change=10,
+        hidden_layer_sizes=(512, 256), # First hidden layer: 512 neurons. Second hidden layer: 256 neurons.
+        activation="relu", # Function applied to neuron: input < 0 => 0, input > 0 => input
+        solver="adam", # Optimisation algorithm.
+        alpha=1e-4, # Small regularisation.
+        batch_size=256, # Learning from 256 rows at the time.
+        learning_rate_init=1e-3, # The initial step size for weights updating.
+        max_iter=200, # At most 200 passes through the whole training data.
+        early_stopping=True, # The training should stop if the model stops improving.
+        validation_fraction=0.10, # 10% of data reserved for validation, the model is being trained on 70%.
+        n_iter_no_change=10, # The training stops after no improvement has been seen after 10 steps.
         random_state=SEED,
-        verbose=True,
+        verbose=True, # Printing the loss value after each step.
     )
 
     mlp.fit(XTrain, YTrain)
 
     joblib.dump(mlp, "models/neural-network.pkl")
 
-    YPred = mlp.predict(XTest)
+    YPred = mlp.predict(XTest) # Model is trying to predict YTest based on given XTest.
 
     metrics = {
         "model": "Neural Network (MLP)",
-        "accuracy": accuracy_score(YTest, YPred),
-        "precision": precision_score(YTest, YPred, average="weighted", zero_division=0),
-        "recall": recall_score(YTest, YPred, average="weighted", zero_division=0),
-        "f1": f1_score(YTest, YPred, average="weighted", zero_division=0),
+        "accuracy": accuracy_score(YTest, YPred), # Fraction of correct predictions.
+        "precision": precision_score(YTest, YPred, average="weighted", zero_division=0), # How much of the class X that model predicted were actually class Y.
+        "recall": recall_score(YTest, YPred, average="weighted", zero_division=0), # Similar to precision, but out of everything that was actually X how much model caught.
+        "f1": f1_score(YTest, YPred, average="weighted", zero_division=0), # Mean of precision and recall.
     }
 
     print(f"{PREFIX} Neural Network (MLP)\n")
     print(classification_report(YTest, YPred, target_names=labelEncoder.classes_, zero_division=0))
 
+    # Here we define a classic confusion matrix, YTest on X-axes and XTest on Y-axes.
     confusionMatrix = confusion_matrix(YTest, YPred)
     fig, axes = plt.subplots(figsize=(10, 8))
 
+    # Coloring the confusion matrix.
     sns.heatmap(confusionMatrix, annot=True, fmt="d", cmap="Purples", xticklabels=labelEncoder.classes_, yticklabels=labelEncoder.classes_, ax=axes)
     
     axes.set_title("Confusion Matrix – Neural Network (MLP)", fontsize=13, pad=12)
