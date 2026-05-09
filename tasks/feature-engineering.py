@@ -15,7 +15,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
-from sklearn.pipeline import Pipeline
 from scipy.sparse import hstack, csr_matrix
 
 PREFIX = "[DC: Feature Engineering]"

@@ -1,6 +1,5 @@
 # Task 4: Neural Network Training
 # Input: 200-dimensional SVD-reduced TF-IDF vectors.
-# Architecture: Dense(512, relu) -> Dropout(0.3) -> Dense(256, relu) -> Dropout(0.3) -> Dense(nClasses, softmax)
 # Results are saved to results/neural-network-results.csv and a confusion matrix graph is produced.
 
 import joblib

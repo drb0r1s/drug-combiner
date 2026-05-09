@@ -10,7 +10,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import f1_score
 
 PREFIX="[DC: Compare Models]"
 
