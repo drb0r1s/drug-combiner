@@ -1,5 +1,5 @@
 # Task 5: Compare Models
-# Merges resulta from all models, produces comparion bar charts, and writes a final summary table to results/final-comparison.csv.
+# Merges results from all models, produces comparion bar charts, and writes a final summary table to results/final-comparison.csv.
 # Also performs a brief over-fitting analysis by re-evaluating the best model on the training set and comparing with test performance.
 
 import os
